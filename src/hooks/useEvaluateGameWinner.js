@@ -30,7 +30,6 @@ export default function useEvaluateGameWinner() {
 
     if (counterPlayer1 === 3) {
       setGameWinner(players.player1)
-      // dispatch({ type: 'update-winner', playerName: players.player1.name })
       players.player1.won++;
     } else if (counterPlayer2 === 3) {
       setGameWinner(players.player2)
@@ -38,19 +37,6 @@ export default function useEvaluateGameWinner() {
       setGameWinner(null)
     }
   }, [rounds, players, dispatch])
-
-  // useEffect(() => {
-  //   console.log(gameWinner)
-
-  //   // if (gameWinner) {
-  //   //   setPlayers((p) => ({
-  //   //     ...p, player2: {
-  //   //       ...p.player2,
-  //   //       won: gameWinner.won + 1
-  //   //     }
-  //   //   }))
-  //   // }
-  // }, [gameWinner, setPlayers])
 
   return gameWinner
 }

@@ -11,8 +11,7 @@ function Home() {
 
   const {
     players,
-    dispatch,
-    // setPlayers,
+    setPlayers,
     moves,
     movePlayer1,
     setMovePlayer1,
@@ -22,17 +21,12 @@ function Home() {
 
   const onSubmitForm = (inputs) => {
     if (inputs.player1name !== '' && inputs.player2name !== '') {
-      dispatch({
-        type: 'update-name',
-        player1Name: inputs.player1name,
-        player2Name: inputs.player2name
-      })
-      // setPlayers(() => ({
-      //   ...players,
-      //   player1: { ...players.player1, name: inputs.player1name },
-      //   player2: { ...players.player2, name: inputs.player2name },
-      //   currentPlayerName: inputs.player1name
-      // }))
+      setPlayers(() => ({
+        ...players,
+        player1: { ...players.player1, name: inputs.player1name },
+        player2: { ...players.player2, name: inputs.player2name },
+        currentPlayerName: inputs.player1name
+      }))
     }
   }
 
@@ -42,13 +36,9 @@ function Home() {
 
     if (playerName === players.player1.name) {
       setMovePlayer1(selectedMove)
-      dispatch({
-        type: 'update-current-player',
-        currentPlayerName: players.player2.name
-      })
-      // setPlayers(() => ({
-      //   ...players, currentPlayerName: players.player2.name
-      // }))
+      setPlayers(() => ({
+        ...players, currentPlayerName: players.player2.name
+      }))
     } else {
 
       const winner = battle(moves, movePlayer1, selectedMove)
@@ -58,13 +48,9 @@ function Home() {
       if (winner) {
         roundWinner = winner.move === movePlayer1 ? players.player1.name : winner.move === selectedMove ? players.player2.name : null
       }
-      dispatch({
-        type: 'update-current-player',
-        currentPlayerName: players.player1.name
-      })
-      // setPlayers(() => ({
-      //   ...players, currentPlayerName: players.player1.name
-      // }))
+      setPlayers(() => ({
+        ...players, currentPlayerName: players.player1.name
+      }))
 
       setRounds(() => ([
         ...rounds, {
@@ -75,10 +61,9 @@ function Home() {
   }
 
   const onResetGame = () => {
-    // setPlayers(() => ({
-    //   player1: { name: '', won: 0 }, player2: { name: '', won: 0 }, currentPlayerName: ''
-    // }))
-    dispatch({ type: 'reset-state' })
+    setPlayers(() => ({
+      player1: { name: '', won: 0 }, player2: { name: '', won: 0 }, currentPlayerName: ''
+    }))
     setRounds(() => ([]))
     setMovePlayer1(() => ({}))
   }
