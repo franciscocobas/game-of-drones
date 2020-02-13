@@ -1,115 +1,77 @@
-import React, { useState, useReducer } from 'react'
+import React from 'react'
 
 import useEvaluateGameWinner from '../hooks/useEvaluateGameWinner'
+import { useAppContext } from '../contexts/app-context'
 
 import PlayerMove from './PlayerMove'
 import Score from './Score'
 import Users from './Users'
 
-function reducer(state, action) {
-  switch (action.type) {
-    case 'set-current-move-player-1':
-      return { ...state, currentMovePlayer1: action.currentMovePlayer1, currentPlayer: action.currentPlayer }
-    case 'set-current-move-player-2':
-      return {
-        ...state,
-        currentMovePlayer2: action.currentMovePlayer2,
-        currentPlayer: action.currentPlayer,
-        rounds: [...state.rounds, {
-          movePlayer1: state.currentMovePlayer1, movePlayer2: action.currentMovePlayer2, winner: action.winner
-        }]
-      }
-    case 'set-current-player':
-      return { ...state, currentPlayer: action.player }
-    default:
-      return state;
-  }
-}
-
 function Home() {
 
-  const [player1name, setPlayer1Name] = useState('')
-  const [player2name, setPlayer2Name] = useState('')
+  const {
+    players,
+    setPlayers,
+    moves,
+    movePlayer1,
+    setMovePlayer1,
+    rounds,
+    setRounds
+  } = useAppContext()
 
   const onSubmitForm = (inputs) => {
     if (inputs.player1name !== '' && inputs.player2name !== '') {
-      setPlayer1Name(inputs.player1name)
-      setPlayer2Name(inputs.player2name)
-      dispatch({
-        type: 'set-current-player', player: inputs.player1name
-      })
+      setPlayers(() => ({
+        ...players,
+        player1: inputs.player1name,
+        player2: inputs.player2name,
+        currentPlayer: inputs.player1name
+      }))
     }
   }
 
-  const [{ moves, currentPlayer, rounds, currentMovePlayer1 }, dispatch] = useReducer(reducer, {
-    moves: [
-      { move: 'paper', kills: 'rock' },
-      { move: 'rock', kills: 'scissors' },
-      { move: 'scissors', kills: 'paper' }
-    ],
-    currentPlayer: '',
-    currentMovePlayer1: {},
-    currentMovePlayer2: {},
-    rounds: []
-  })
+  const gameWinner = useEvaluateGameWinner(rounds, players.player1, players.player2)
 
-  const gameWinner = useEvaluateGameWinner(rounds, player1name, player2name)
+  const handleMoveFormSubmit = (playerName, selectedMove) => {
 
-  const battle = (movePlayer1, movePlayer2) => {
-    let move1 = null
-    let move2 = null
-    let winner = null
-
-    moves.forEach((m) => {
-      move1 = movePlayer1 === m.move ? m : move1
-      move2 = movePlayer2 === m.move ? m : move2
-    })
-
-    if (move1.kills === move2.move) {
-      winner = move1
-    } else if (move2.kills === move1.move) {
-      winner = move2
-    }
-    return winner
-  }
-
-  const handleMoveSubmit = (playerName, selectedMove) => {
-
-    if (playerName === player1name) {
-      dispatch({
-        type: 'set-current-move-player-1',
-        currentMovePlayer1: selectedMove,
-        currentPlayer: player2name
-      })
+    if (playerName === players.player1) {
+      setMovePlayer1(selectedMove)
+      setPlayers(() => ({
+        ...players, currentPlayer: players.player2
+      }))
     } else {
-      const winner = battle(currentMovePlayer1, selectedMove)
+
+      const winner = battle(moves, movePlayer1, selectedMove)
 
       let roundWinner = null
 
       if (winner) {
-        roundWinner = winner.move === currentMovePlayer1 ? player1name : winner.move === selectedMove ? player2name : null
+        roundWinner = winner.move === movePlayer1 ? players.player1 : winner.move === selectedMove ? players.player2 : null
       }
 
-      dispatch({
-        type: 'set-current-move-player-2',
-        currentMovePlayer2: selectedMove,
-        currentPlayer: player1name,
-        winner: roundWinner
-      })
+      setPlayers(() => ({
+        ...players, currentPlayer: players.player1
+      }))
+
+      setRounds(() => ([
+        ...rounds, {
+          movePlayer1, movePlayer2: selectedMove, winner: roundWinner
+        }
+      ]))
     }
   }
 
   return (
     <div className='container'>
       {
-        !player1name && !player2name &&
+        !players.player1 && !players.player2 &&
         <Users onSubmitForm={onSubmitForm} />
       }
       {
-        player1name && player2name && !gameWinner && <PlayerMove
+        players.player1 && players.player2 && !gameWinner && <PlayerMove
           moves={moves}
-          playerName={currentPlayer}
-          onSubmit={handleMoveSubmit}
+          playerName={players.currentPlayer}
+          onSubmit={handleMoveFormSubmit}
           rounds={rounds} />
       }
       {
@@ -127,6 +89,23 @@ function Home() {
   )
 }
 
+const battle = (moves, movePlayer1, movePlayer2) => {
+  let move1 = null
+  let move2 = null
+  let winner = null
+
+  moves.forEach((m) => {
+    move1 = movePlayer1 === m.move ? m : move1
+    move2 = movePlayer2 === m.move ? m : move2
+  })
+
+  if (move1.kills === move2.move) {
+    winner = move1
+  } else if (move2.kills === move1.move) {
+    winner = move2
+  }
+  return winner
+}
 
 export {
   Home
