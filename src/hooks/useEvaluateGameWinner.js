@@ -1,8 +1,16 @@
 import { useState, useEffect } from 'react'
 
-export default function useEvaluateGameWinner(rounds, player1name, player2name) {
+import { useAppContext } from '../contexts/app-context'
+
+export default function useEvaluateGameWinner() {
 
   const [gameWinner, setGameWinner] = useState(null)
+
+  const {
+    players,
+    dispatch,
+    rounds,
+  } = useAppContext()
 
   useEffect(() => {
 
@@ -12,22 +20,37 @@ export default function useEvaluateGameWinner(rounds, player1name, player2name) 
     if (rounds.length > 1) {
 
       rounds.forEach((round) => {
-        if (round.winner === player1name) {
+        if (round.winner === players.player1.name) {
           counterPlayer1++;
-        } else if (round.winner === player2name) {
+        } else if (round.winner === players.player2.name) {
           counterPlayer2++
         }
       })
     }
 
     if (counterPlayer1 === 3) {
-      setGameWinner(player1name)
+      setGameWinner(players.player1)
+      // dispatch({ type: 'update-winner', playerName: players.player1.name })
+      players.player1.won++;
     } else if (counterPlayer2 === 3) {
-      setGameWinner(player2name)
+      setGameWinner(players.player2)
     } else {
       setGameWinner(null)
     }
-  }, [rounds, player1name, player2name])
+  }, [rounds, players, dispatch])
+
+  // useEffect(() => {
+  //   console.log(gameWinner)
+
+  //   // if (gameWinner) {
+  //   //   setPlayers((p) => ({
+  //   //     ...p, player2: {
+  //   //       ...p.player2,
+  //   //       won: gameWinner.won + 1
+  //   //     }
+  //   //   }))
+  //   // }
+  // }, [gameWinner, setPlayers])
 
   return gameWinner
 }

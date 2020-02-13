@@ -11,7 +11,8 @@ function Home() {
 
   const {
     players,
-    setPlayers,
+    dispatch,
+    // setPlayers,
     moves,
     movePlayer1,
     setMovePlayer1,
@@ -21,24 +22,33 @@ function Home() {
 
   const onSubmitForm = (inputs) => {
     if (inputs.player1name !== '' && inputs.player2name !== '') {
-      setPlayers(() => ({
-        ...players,
-        player1: inputs.player1name,
-        player2: inputs.player2name,
-        currentPlayer: inputs.player1name
-      }))
+      dispatch({
+        type: 'update-name',
+        player1Name: inputs.player1name,
+        player2Name: inputs.player2name
+      })
+      // setPlayers(() => ({
+      //   ...players,
+      //   player1: { ...players.player1, name: inputs.player1name },
+      //   player2: { ...players.player2, name: inputs.player2name },
+      //   currentPlayerName: inputs.player1name
+      // }))
     }
   }
 
-  const gameWinner = useEvaluateGameWinner(rounds, players.player1, players.player2)
+  const gameWinner = useEvaluateGameWinner()
 
   const handleMoveFormSubmit = (playerName, selectedMove) => {
 
-    if (playerName === players.player1) {
+    if (playerName === players.player1.name) {
       setMovePlayer1(selectedMove)
-      setPlayers(() => ({
-        ...players, currentPlayer: players.player2
-      }))
+      dispatch({
+        type: 'update-current-player',
+        currentPlayerName: players.player2.name
+      })
+      // setPlayers(() => ({
+      //   ...players, currentPlayerName: players.player2.name
+      // }))
     } else {
 
       const winner = battle(moves, movePlayer1, selectedMove)
@@ -46,12 +56,15 @@ function Home() {
       let roundWinner = null
 
       if (winner) {
-        roundWinner = winner.move === movePlayer1 ? players.player1 : winner.move === selectedMove ? players.player2 : null
+        roundWinner = winner.move === movePlayer1 ? players.player1.name : winner.move === selectedMove ? players.player2.name : null
       }
-
-      setPlayers(() => ({
-        ...players, currentPlayer: players.player1
-      }))
+      dispatch({
+        type: 'update-current-player',
+        currentPlayerName: players.player1.name
+      })
+      // setPlayers(() => ({
+      //   ...players, currentPlayerName: players.player1.name
+      // }))
 
       setRounds(() => ([
         ...rounds, {
@@ -62,9 +75,10 @@ function Home() {
   }
 
   const onResetGame = () => {
-    setPlayers(() => ({
-      player1: '', player2: '', currentPlayer: ''
-    }))
+    // setPlayers(() => ({
+    //   player1: { name: '', won: 0 }, player2: { name: '', won: 0 }, currentPlayerName: ''
+    // }))
+    dispatch({ type: 'reset-state' })
     setRounds(() => ([]))
     setMovePlayer1(() => ({}))
   }
@@ -72,13 +86,13 @@ function Home() {
   return (
     <div className='container'>
       {
-        !players.player1 && !players.player2 &&
+        !players.player1.name && !players.player2.name &&
         <Users onSubmitForm={onSubmitForm} />
       }
       {
-        players.player1 && players.player2 && !gameWinner && <PlayerMove
+        players.player1.name && players.player2.name && !gameWinner && <PlayerMove
           moves={moves}
-          playerName={players.currentPlayer}
+          playerName={players.currentPlayerName}
           onSubmit={handleMoveFormSubmit}
           rounds={rounds} />
       }
@@ -90,7 +104,7 @@ function Home() {
       {
         gameWinner && (
           <>
-            <h1>And the winner is {gameWinner}</h1>
+            <h1>And the winner is {gameWinner.name}</h1>
             <button onClick={onResetGame}>Play Again</button>
           </>)
       }
