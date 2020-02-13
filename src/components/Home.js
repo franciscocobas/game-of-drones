@@ -61,6 +61,14 @@ function Home() {
     }
   }
 
+  const onResetGame = () => {
+    setPlayers(() => ({
+      player1: '', player2: '', currentPlayer: ''
+    }))
+    setRounds(() => ([]))
+    setMovePlayer1(() => ({}))
+  }
+
   return (
     <div className='container'>
       {
@@ -83,6 +91,7 @@ function Home() {
         gameWinner && (
           <>
             <h1>And the winner is {gameWinner}</h1>
+            <button onClick={onResetGame}>Play Again</button>
           </>)
       }
     </div>

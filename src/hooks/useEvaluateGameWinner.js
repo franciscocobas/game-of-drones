@@ -24,6 +24,8 @@ export default function useEvaluateGameWinner(rounds, player1name, player2name) 
       setGameWinner(player1name)
     } else if (counterPlayer2 === 3) {
       setGameWinner(player2name)
+    } else {
+      setGameWinner(null)
     }
   }, [rounds, player1name, player2name])
 
