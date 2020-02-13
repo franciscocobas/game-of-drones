@@ -1,9 +1,10 @@
 import React, { useState, useReducer } from 'react'
 
-import useInputsForm from '../hooks/useInutsForm'
 import useEvaluateGameWinner from '../hooks/useEvaluateGameWinner'
 
 import PlayerMove from './PlayerMove'
+import Score from './Score'
+import Users from './Users'
 
 function reducer(state, action) {
   switch (action.type) {
@@ -26,11 +27,11 @@ function reducer(state, action) {
 }
 
 function Home() {
-  
+
   const [player1name, setPlayer1Name] = useState('')
   const [player2name, setPlayer2Name] = useState('')
-  
-  const onSubmitForm = () => {
+
+  const onSubmitForm = (inputs) => {
     if (inputs.player1name !== '' && inputs.player2name !== '') {
       setPlayer1Name(inputs.player1name)
       setPlayer2Name(inputs.player2name)
@@ -40,10 +41,6 @@ function Home() {
     }
   }
 
-  const { inputs, handleInputChange, handleSubmit } = useInputsForm({
-    player1name: '', player2name: ''
-  }, onSubmitForm)
-  
   const [{ moves, currentPlayer, rounds, currentMovePlayer1 }, dispatch] = useReducer(reducer, {
     moves: [
       { move: 'paper', kills: 'rock' },
@@ -55,13 +52,14 @@ function Home() {
     currentMovePlayer2: {},
     rounds: []
   })
-  
+
   const gameWinner = useEvaluateGameWinner(rounds, player1name, player2name)
 
   const battle = (movePlayer1, movePlayer2) => {
     let move1 = null
     let move2 = null
     let winner = null
+
     moves.forEach((m) => {
       move1 = movePlayer1 === m.move ? m : move1
       move2 = movePlayer2 === m.move ? m : move2
@@ -105,21 +103,7 @@ function Home() {
     <div className='container'>
       {
         !player1name && !player2name &&
-        <form onSubmit={handleSubmit}>
-          <div className='row '>
-            <div className='col-12 col-md-6'>
-              <h3>Player 1</h3>
-              <input name='player1name' type='text' className='' onChange={handleInputChange} value={inputs.player1name} />
-            </div>
-            <div className='col-12 col-md-6'>
-              <h3>Player 2</h3>
-              <input name='player2name' type='text' className='' onChange={handleInputChange} value={inputs.player2name} />
-            </div>
-            <div className='col-12'>
-              <button>Battle</button>
-            </div>
-          </div>
-        </form>
+        <Users onSubmitForm={onSubmitForm} />
       }
       {
         player1name && player2name && !gameWinner && <PlayerMove
@@ -143,26 +127,6 @@ function Home() {
   )
 }
 
-function Score({ rounds }) {
-  return (
-    <div>
-      <h3>Scores</h3>
-      <div className='row justify-content-center'>
-        <div className='col-12 col-md-5'>
-          {
-            rounds.map((round, i) => (
-
-              <div className='row' key={i}>
-                <div className='col-6'>Round {i + 1}</div>
-                <div className='col-6'>{round.winner ? round.winner : 'Draw'}</div>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </div>
-  )
-}
 
 export {
   Home

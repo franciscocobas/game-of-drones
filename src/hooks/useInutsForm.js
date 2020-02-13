@@ -7,7 +7,7 @@ export default function useInputsForm(initialState, callback) {
     if (event) {
       event.preventDefault()
     }
-    callback()
+    callback(inputs)
   }
 
   const handleInputChange = (event) => {
