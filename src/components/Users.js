@@ -1,6 +1,6 @@
 import React from 'react'
 
-import useInputsForm from '../hooks/useInutsForm'
+import useInputsForm from '../hooks/useInputsForm'
 
 export default function Users({onSubmitForm}) {
 

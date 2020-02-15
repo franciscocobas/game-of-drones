@@ -1,0 +1,10 @@
+@import './variables';
+
+.player-move-container {
+  select {
+    background-color: $white;
+  }
+  label {
+    font-size: $font-medium;
+  }
+}
