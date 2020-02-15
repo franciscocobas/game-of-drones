@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 export default function Score({ rounds }) {
   return (
@@ -21,4 +22,8 @@ export default function Score({ rounds }) {
       </div>
     </div>
   )
+}
+
+Score.propTypes = {
+  rounds: PropTypes.array.isRequired
 }
