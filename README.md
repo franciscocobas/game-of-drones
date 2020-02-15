@@ -7,6 +7,9 @@ To install the app clone this repository, move to the project root directory and
 ## Start Game of Drones App
 Run the command `npm start` to start the application. 
 
+## Displaying statics
+There is a route `http://localhost:3000/statics` to display the statics of the players
+
 ## Aditional information
 Because this project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), you may use all the aditional feautures that Create React App gives. 
 
