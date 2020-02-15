@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import '../styles/Home.scss'
+import { ReactComponent as RockScissorsHandSvg } from '../images/rock_scissors_hand.svg'
 
 import { useAppContext } from '../contexts/app-context'
 import useSaveAndRetreivePlayers from '../hooks/useSaveAndRetreivePlayers'
@@ -14,10 +15,9 @@ export default function Home() {
   const {
     players, setPlayers,
     moves,
-    rounds,
-    setRounds,
-    gameWinner,
-    setGameWinner,
+    loading,
+    rounds, setRounds,
+    gameWinner, setGameWinner,
   } = useAppContext()
 
   const { savePlayersToBackend } = useSaveAndRetreivePlayers()
@@ -80,30 +80,43 @@ export default function Home() {
   }
 
   return (
-    <div className='container home-container'>
+    <>
+      <div className='container'>
+        <div className='row justify-content-center'>
+          <h1 className='col-12 mt-5'>Game of Drones</h1>
+          <div className={`animated-col col-12 mt-3 mb-5 ${!loading && players.player1.name && players.player2.name ? ' col-md-3' : ' col-md-5'}`}>
+            <RockScissorsHandSvg className='img-fluid' />
+          </div>
+        </div>
+      </div>
       {
-        !players.player1.name && !players.player2.name &&
-        <Users onSubmitForm={onSubmitForm} />
+        !loading ?
+          <div className='container home-container'>
+            {
+              !players.player1.name && !players.player2.name &&
+              <Users onSubmitForm={onSubmitForm} />
+            }
+            {
+              players.player1.name && players.player2.name && !gameWinner && <PlayerMove
+                moves={moves}
+                playerName={players.currentPlayerName}
+                onSubmit={handleMoveFormSubmit}
+                rounds={rounds} />
+            }
+            {
+              rounds.length > 0 && (
+                <Score rounds={rounds} />
+              )
+            }
+            {
+              gameWinner && (
+                <div className='mt-3'>
+                  <h1>And the winner is <b>{gameWinner.name} <span role='img' aria-label='Celebrate Emoji'>🎉</span><span role='img' aria-label='Celebrate Emoji'>🎊</span></b></h1>
+                  <button className='mt-3' onClick={onResetGame}>Play Again</button>
+                </div>)
+            }
+          </div> : <></>
       }
-      {
-        players.player1.name && players.player2.name && !gameWinner && <PlayerMove
-          moves={moves}
-          playerName={players.currentPlayerName}
-          onSubmit={handleMoveFormSubmit}
-          rounds={rounds} />
-      }
-      {
-        rounds.length > 0 && (
-          <Score rounds={rounds} />
-        )
-      }
-      {
-        gameWinner && (
-          <div className='mt-3'>
-            <h1>And the winner is <b>{gameWinner.name} <span role='img' aria-label='Celebrate Emoji'>🎉</span><span role='img' aria-label='Celebrate Emoji'>🎊</span></b></h1>
-            <button className='mt-3' onClick={onResetGame}>Play Again</button>
-          </div>)
-      }
-    </div>
+    </>
   )
 }
