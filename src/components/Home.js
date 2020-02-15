@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { useAppContext } from '../contexts/app-context'
 
@@ -9,16 +9,15 @@ import Users from './Users'
 function Home() {
 
   const {
-    players,
-    setPlayers,
+    players, setPlayers,
     moves,
-    movePlayer1,
-    setMovePlayer1,
     rounds,
     setRounds,
-    gameWinner, 
+    gameWinner,
     setGameWinner,
   } = useAppContext()
+
+  const [movePlayer1, setMovePlayer1] = useState({})
 
   const onSubmitForm = (inputs) => {
     if (inputs.player1name !== '' && inputs.player2name !== '') {
@@ -126,7 +125,7 @@ function evaluateGameWinner(rounds, players, setPlayers) {
       ...players,
       player1: gameWinner
     }))
-    
+
   } else if (counterPlayer2 === 3) {
     gameWinner = { ...players.player2, won: players.player2.won + 1 }
     setPlayers(() => ({
