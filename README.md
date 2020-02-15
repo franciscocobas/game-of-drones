@@ -1,4 +1,14 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Game of Drones React APP
+Welcome to Game of Drones React APP, this project is part of the UruIT Full-Stack exam. If you have any question please send me an email to fcarocena@gmail.com
+
+## Install App
+To install the app clone this repository, move to the project root directory and run `npm install`
+
+## Start Game of Drones App
+Run the command `npm start` to start the application. 
+
+## Aditional information
+Because this project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), you may use all the aditional feautures that Create React App gives. 
 
 ## Available Scripts
 
