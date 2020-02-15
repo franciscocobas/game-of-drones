@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import '../styles/Home.scss'
 
 import { useAppContext } from '../contexts/app-context'
+import { savePlayers, modifyPlayer } from '../api/api'
 
 import PlayerMove from './PlayerMove'
 import Score from './Score'
@@ -22,34 +23,32 @@ function Home() {
 
   const onSubmitForm = (inputs) => {
     if (inputs.player1name !== '' && inputs.player2name !== '') {
-      setPlayers(() => ({
-        ...players,
-        player1: { ...players.player1, name: inputs.player1name },
-        player2: { ...players.player2, name: inputs.player2name },
-        currentPlayerName: inputs.player1name
-      }))
+      let player1 = { ...players.player1, name: inputs.player1name }
+      let player2 = { ...players.player2, name: inputs.player2name }
+
+      saveAndRetreivePlayers(player1, player2, players, setPlayers)
     }
   }
 
   const handleMoveFormSubmit = (playerName, selectedMove) => {
 
+    let currentPlayerName = ''
+
     if (playerName === players.player1.name) {
       setMovePlayer1(selectedMove)
-      setPlayers(() => ({
-        ...players, currentPlayerName: players.player2.name
-      }))
+      currentPlayerName = players.player2.name
     } else {
 
+      currentPlayerName = players.player1.name
+
       const winner = battle(moves, movePlayer1, selectedMove)
+
+      // If roundwinner is null then battle was draw
       let roundWinner = null
 
       if (winner) {
         roundWinner = winner.move === movePlayer1 ? players.player1.name : winner.move === selectedMove ? players.player2.name : null
       }
-
-      setPlayers(() => ({
-        ...players, currentPlayerName: players.player1.name
-      }))
 
       setRounds(() => {
         const currentRounds = [
@@ -59,10 +58,13 @@ function Home() {
         ]
 
         setGameWinner(evaluateGameWinner(currentRounds, players, setPlayers, setGameWinner))
-
         return currentRounds
       })
     }
+
+    setPlayers(() => ({
+      ...players, currentPlayerName
+    }))
   }
 
   const onResetGame = () => {
@@ -95,7 +97,7 @@ function Home() {
       {
         gameWinner && (
           <div className='mt-3'>
-            <h1>And the winner is <b>{gameWinner.name} 🎉🎊</b></h1>
+            <h1>And the winner is <b>{gameWinner.name} <span role='img' aria-label='Celebrate Emoji'>🎉</span><span role='img' aria-label='Celebrate Emoji'>🎊</span></b></h1>
             <button className='mt-3' onClick={onResetGame}>Play Again</button>
           </div>)
       }
@@ -127,13 +129,19 @@ function evaluateGameWinner(rounds, players, setPlayers) {
       player1: gameWinner
     }))
 
+    // Save Player to backend
+    modifyPlayer(gameWinner)
+
   } else if (counterPlayer2 === 3) {
     gameWinner = { ...players.player2, won: players.player2.won + 1 }
     setPlayers(() => ({
       ...players,
       player2: gameWinner
     }))
+    // Save Player to backend
+    modifyPlayer(gameWinner)
   }
+
   return gameWinner
 }
 
@@ -153,6 +161,41 @@ function battle(moves, movePlayer1, movePlayer2) {
     winner = move2
   }
   return winner
+}
+
+function saveAndRetreivePlayers(player1, player2, players, setPlayers) {
+
+  // Save or retreive user in Backend
+  savePlayers(player1, player2).then((resultsArray) => {
+
+    if (resultsArray && resultsArray.length > 0) {
+
+      const response_player1 = resultsArray[0]
+      const response_player2 = resultsArray[1]
+
+      if (response_player1.result === 'ok' && response_player2.result === 'ok') {
+
+        // Overwrite users state with DB users
+        if (response_player1.player && response_player1.player.length > 0 && response_player1.player[0]) {
+          const foundPlayer = response_player1.player[0]
+          player1 = { ...player1, ...foundPlayer }
+        }
+
+        if (response_player2.player && response_player2.player.length > 0 && response_player2.player[0]) {
+          const foundPlayer = response_player2.player[0]
+          player2 = { ...player2, ...foundPlayer }
+        }
+      } else {
+        throw new Error('There was an error trying to save users');
+      }
+    }
+  }).catch((err) => {
+    console.log(err);
+  }).finally(() => {
+    setPlayers(() => ({
+      ...players, player1, player2, currentPlayerName: player1.name
+    }))
+  })
 }
 
 export {

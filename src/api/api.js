@@ -1,5 +1,19 @@
 const DOMAIN = 'http://localhost:8081'
-const PLAYERS_URI = `${DOMAIN}/api/players`
+const BASE_URI = `${DOMAIN}/api`
+const PLAYERS_URI = `${BASE_URI}/players`
+const CREATE_PLAYER_URI = `${BASE_URI}/player/create`
+
+
+async function modifyPlayer(player) {
+  return await sendPostRequest(`${BASE_URI}/player/${player._id}/update`, player)
+}
+
+async function savePlayers(player1, player2) {
+  return await Promise.all([
+    sendPostRequest(CREATE_PLAYER_URI, player1),
+    sendPostRequest(CREATE_PLAYER_URI, player2)
+  ]) 
+}
 
 async function getPlayers() {
   return await sendRequest(PLAYERS_URI)
@@ -28,7 +42,7 @@ async function sendRequest(URI, data, method) {
 }
 
 export {
-  sendRequest,
-  sendPostRequest,
+  modifyPlayer, 
+  savePlayers,
   getPlayers,
 }
