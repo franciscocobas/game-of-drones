@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import useInputsForm from '../hooks/useInputsForm'
 
@@ -24,4 +25,8 @@ export default function Users({onSubmitForm}) {
         </div>
       </div>
     </form>)
+}
+
+Users.propTypes = {
+  onSubmitForm: PropTypes.func.isRequired
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import useInputsForm from '../hooks/useInputsForm'
 
 import '../styles/PlayerMove.scss'
@@ -35,4 +36,11 @@ export default function PlayerMove({ moves, playerName, onSubmit, rounds }) {
       </form>
     </div>
   )
+}
+
+PlayerMove.propTypes = {
+  moves: PropTypes.array.isRequired,
+  playerName: PropTypes.string.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  rounds: PropTypes.array.isRequired
 }
