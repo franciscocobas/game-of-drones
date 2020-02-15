@@ -22,6 +22,7 @@ export default function useInputsForm(initialState, callback) {
   return {
     handleSubmit,
     handleInputChange,
-    inputs
+    inputs,
+    setInputs
   };
 }

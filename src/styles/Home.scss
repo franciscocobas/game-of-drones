@@ -1,0 +1,19 @@
+@import './variables';
+
+.home-container {
+  input {
+    padding: 0.25em 0.5em;
+    &:active, &:focus {
+      outline: none;
+      border: 2px solid $lightgrey;
+    }
+  }
+  button {
+    background-color: $black;
+    color: $white;
+    border: none;
+    border-radius: 3px;;
+    padding: 0.5em 1em;
+    font-size: $font-medium;
+  }
+}

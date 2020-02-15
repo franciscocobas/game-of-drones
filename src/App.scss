@@ -1,3 +1,17 @@
+@import './styles/variables';
+
 .app {
-  text-align: center;
+  font-family: 'Roboto Slab', serif;
+  h1 {
+    font-family: 'Montserrat', sans-serif;
+  }
+  .red-text {
+    color: $red;
+  }
+  .grey-text {
+    color: $grey;
+  }
+  .animated-col {
+    transition: all 0.3s ease-out;
+  }
 }

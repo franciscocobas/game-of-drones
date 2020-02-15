@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import '../styles/Home.scss'
 
 import { useAppContext } from '../contexts/app-context'
 
@@ -74,7 +75,7 @@ function Home() {
   }
 
   return (
-    <div className='container'>
+    <div className='container home-container'>
       {
         !players.player1.name && !players.player2.name &&
         <Users onSubmitForm={onSubmitForm} />
@@ -93,10 +94,10 @@ function Home() {
       }
       {
         gameWinner && (
-          <>
-            <h1>And the winner is {gameWinner.name}</h1>
-            <button onClick={onResetGame}>Play Again</button>
-          </>)
+          <div className='mt-3'>
+            <h1>And the winner is <b>{gameWinner.name} 🎉🎊</b></h1>
+            <button className='mt-3' onClick={onResetGame}>Play Again</button>
+          </div>)
       }
     </div>
   )
