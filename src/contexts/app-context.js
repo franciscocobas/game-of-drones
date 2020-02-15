@@ -15,8 +15,9 @@ const initalState = {
 export function AppContextProvider({ children }) {
 
   const [players, setPlayers] = useState(initalState)
-
   const [movePlayer1, setMovePlayer1] = useState({})
+  const [gameWinner, setGameWinner] = useState(null)
+  const [rounds, setRounds] = useState([])
 
   const [moves, setMoves] = useState([
     { move: 'paper', kills: 'rock' },
@@ -24,13 +25,12 @@ export function AppContextProvider({ children }) {
     { move: 'scissors', kills: 'paper' }
   ])
 
-  const [rounds, setRounds] = useState([])
-
   let configObject = {
     players, setPlayers,
     moves, setMoves,
     movePlayer1, setMovePlayer1,
-    rounds, setRounds
+    rounds, setRounds,
+    gameWinner, setGameWinner
   }
 
   return (

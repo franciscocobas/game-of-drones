@@ -1,6 +1,5 @@
 import React from 'react'
 
-import useEvaluateGameWinner from '../hooks/useEvaluateGameWinner'
 import { useAppContext } from '../contexts/app-context'
 
 import PlayerMove from './PlayerMove'
@@ -16,7 +15,9 @@ function Home() {
     movePlayer1,
     setMovePlayer1,
     rounds,
-    setRounds
+    setRounds,
+    gameWinner, 
+    setGameWinner,
   } = useAppContext()
 
   const onSubmitForm = (inputs) => {
@@ -30,8 +31,6 @@ function Home() {
     }
   }
 
-  const gameWinner = useEvaluateGameWinner()
-
   const handleMoveFormSubmit = (playerName, selectedMove) => {
 
     if (playerName === players.player1.name) {
@@ -42,21 +41,27 @@ function Home() {
     } else {
 
       const winner = battle(moves, movePlayer1, selectedMove)
-
       let roundWinner = null
 
       if (winner) {
         roundWinner = winner.move === movePlayer1 ? players.player1.name : winner.move === selectedMove ? players.player2.name : null
       }
+
       setPlayers(() => ({
         ...players, currentPlayerName: players.player1.name
       }))
 
-      setRounds(() => ([
-        ...rounds, {
-          movePlayer1, movePlayer2: selectedMove, winner: roundWinner
-        }
-      ]))
+      setRounds(() => {
+        const currentRounds = [
+          ...rounds, {
+            movePlayer1, movePlayer2: selectedMove, winner: roundWinner
+          }
+        ]
+
+        setGameWinner(evaluateGameWinner(currentRounds, players, setPlayers, setGameWinner))
+
+        return currentRounds
+      })
     }
   }
 
@@ -66,6 +71,7 @@ function Home() {
     }))
     setRounds(() => ([]))
     setMovePlayer1(() => ({}))
+    setGameWinner(null)
   }
 
   return (
@@ -97,7 +103,41 @@ function Home() {
   )
 }
 
-const battle = (moves, movePlayer1, movePlayer2) => {
+function evaluateGameWinner(rounds, players, setPlayers) {
+
+  let counterPlayer1 = 0
+  let counterPlayer2 = 0
+  let gameWinner = null
+
+  if (rounds.length > 2) {
+
+    rounds.forEach((round) => {
+      if (round.winner === players.player1.name) {
+        counterPlayer1++;
+      } else if (round.winner === players.player2.name) {
+        counterPlayer2++
+      }
+    })
+  }
+
+  if (counterPlayer1 === 3) {
+    gameWinner = { ...players.player1, won: players.player1.won + 1 }
+    setPlayers(() => ({
+      ...players,
+      player1: gameWinner
+    }))
+    
+  } else if (counterPlayer2 === 3) {
+    gameWinner = { ...players.player2, won: players.player2.won + 1 }
+    setPlayers(() => ({
+      ...players,
+      player2: gameWinner
+    }))
+  }
+  return gameWinner
+}
+
+function battle(moves, movePlayer1, movePlayer2) {
   let move1 = null
   let move2 = null
   let winner = null
